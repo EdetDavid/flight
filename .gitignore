@@ -1,0 +1,39 @@
+# Python bytecode and compiled files
+*.py[cod]
+__pycache__/
+*.so
+
+# Django specific
+*.log
+local_settings.py
+
+media/
+
+# Ignore virtual environments
+venv/
+env/
+ENV/
+.venv/
+.VENV/
+
+# VSCode settings (optional)
+.vscode/
+
+# Ignore environment variables
+.env
+
+# Node.js
+node_modules/
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore JetBrains IDE project files
+.idea/
+
+# Ignore migrations
+*/migrations/*
+!*/migrations/__init__.py
+
+# Ignore compiled static files
+staticfiles/
