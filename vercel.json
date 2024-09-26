@@ -21,8 +21,8 @@
       "dest": "/static/$1"
     },
     {
-      "source": "/(.*)",
-      "destination": "amadeus_demo_api/wsgi.py"
+      "src": "/(.*)",
+      "dest": "amadeus_demo_api/wsgi.py"
     }
   ]
 }
