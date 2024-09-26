@@ -17,12 +17,12 @@
   "routes": [
   
     {
-      "source": "/static/(.*)",
-      "destination": "/static/$1"
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "amadeus_demo_api/wsgi.py"
+      "source": "/(.*)",
+      "destination": "amadeus_demo_api/wsgi.py"
     }
   ]
 }
