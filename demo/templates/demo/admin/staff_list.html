@@ -1,27 +1,15 @@
 {% extends 'demo/admin/base.html' %}
-
+{% load static %}
+{% block title %}Staff List{% endblock %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff List</title>
+    {% load static %}
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <style>
-        /* General Reset and Font Setup */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-        
-        body {
-            background-color: #f4f7f6;
-            color: #333;
-            padding: 20px;
-        }
-
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -102,8 +90,44 @@
             background-color: #0056b3;
             transform: translateY(-3px);
         }
+
+
+     /* Phones (max-width: 768px) */
+     @media (max-width: 768px) {
+        h1 {
+            font-size: 1.75rem; /* Adjust headline for mobile */
+        }
+
+        th, td {
+            padding: 0.5rem; /* Reduce padding */
+            font-size: 0.875rem;
+        }
+
+        .profile-image {
+            width: 50px;
+            height: 50px;
+        }
+
+        .btn-approve, .btn-disapprove {
+            padding: 0.4rem 0.8rem; /* Smaller buttons */
+            font-size: 0.75rem;
+        }
+
+        /* Add Scroll on Mobile */
+        .table-container {
+            overflow-x: auto; /* Horizontal scroll for small screens */
+            width:  80vw !important;
+        }
+
+        table {
+            min-width: 500px; /* Ensure the table doesn't shrink too much */
+            
+        }
+    }
+
+        
     </style>
-</head>
+
 <body>
     <div class="container">
         <a href="{% url 'admin_profile' %}" class="btn-back">Back to Dashboard</a>
@@ -122,15 +146,18 @@
                 </thead>
                 <tbody>
                     {% for staff in staffs %}
-                    <tr>
-                        <td><img src="{{ staff.staff.profile.profile_picture.url }}" alt="{{ staff.username }}'s Profile" class="profile-image">
-                        </td>
-                        <td>{{ staff.staff.username }}</td>
-                        <td>{{ staff.first_name }}</td>
-                        <td>{{ staff.last_name }}</td>
-                        <td>{{ staff.staff.email }}</td>
-                        <td>{{ staff.phone }}</td>
-                    </tr>
+                        <tr>
+                            <td>
+                                <img src="{{ staff.staff.profile.profile_picture.url }}"
+                                     alt="{{ staff.username }}'s Profile"
+                                     class="profile-image">
+                            </td>
+                            <td>{{ staff.staff.username }}</td>
+                            <td>{{ staff.first_name }}</td>
+                            <td>{{ staff.last_name }}</td>
+                            <td>{{ staff.staff.email }}</td>
+                            <td>{{ staff.phone }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

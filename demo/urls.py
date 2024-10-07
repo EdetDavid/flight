@@ -38,6 +38,7 @@ urlpatterns = [
          views.thrive_admin_approval_view, name='thrive_admin_approval_view'),
     path('thrive-administrator/report/',
          views.thrive_report, name='thrive_report'),
+#     path('thrive-administrator/profile/', views.thrive_admin_profile_view, name='thrive_admin_profile'),
 
 
     path('staff-list/', views.staff_list, name='staff_list'),

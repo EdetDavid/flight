@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Flight Booking Confirmation</title>
+    </head>
+    <body>
+        <h1>Flight Booking Confirmation</h1>
+        <p>Dear {{ user.first_name }},</p>
+        <p>Your flight has been successfully booked. Here are the details:</p>
+        <h2>Flight Information:</h2>
+        <ul>
+            <li>
+                <strong>Origin:</strong> {{ origin }}
+            </li>
+            <li>
+                <strong>Destination:</strong> {{ destination }}
+            </li>
+            <li>
+                <strong>Departure Date:</strong> {{ departure_date }}
+            </li>
+            {% if return_date %}
+                <li>
+                    <strong>Return Date:</strong> {{ return_date }}
+                </li>
+            {% endif %}
+            <li>
+                <strong>Travel Class:</strong> {{ travel_class }}
+            </li>
+        </ul>
+        <h2>Booking Details:</h2>
+        {% for booking in flight_details %}
+            <p>
+                <strong>Booking Reference:</strong> {{ booking.booking_reference }}
+            </p>
+            <!-- Add more booking details as needed -->
+        {% endfor %}
+        <p>Thank you for choosing our service. Have a great trip!</p>
+        <p>
+            Best regards,
+            <br>
+            Your Flight Booking Team
+        </p>
+    </body>
+</html>

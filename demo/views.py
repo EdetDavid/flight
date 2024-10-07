@@ -1,44 +1,28 @@
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
 import json
 import ast
-from amadeus import Client, ResponseError, Location
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .flight import Flight
-from .booking import Booking
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
-
 import csv
 import xlwt
 from weasyprint import HTML
-
+import logging
 import requests
-import ast
-
-from .models import Admin, Staff, Profile, Flight_model, PriceIncrement, ThriveAdmin
-from .forms import AdminUserCreationForm, StaffUserCreationForm, ProfileForm, ThriveAdminUserCreationForm
+from amadeus import Client, ResponseError, Location
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .flight import Flight
+from .booking import Booking
+from .models import Admin, Staff, Profile, Flight_model, PriceIncrement, ThriveAdmin
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from .forms import AdminUserCreationForm, StaffUserCreationForm, ProfileForm, ThriveAdminUserCreationForm
+from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
+logger = logging.getLogger(__name__)
 
 
-# send mail
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.conf import settings
-
-
-# amadeus production api credentials
-# amadeus = Client(client_id="MqKAme8vMRNgkipLAHN9JRX9VLotKBom",
-#                  client_secret="Xg6PsIBzcZ6YyhXW",
-
-#                  )
 amadeus = Client()
-
-
-# # amadeus test api credentials
-# amadeus = Client(client_id="mN5sBuLfIkwsf4T5V2PnKoQx9n01CEx6",
-#                  client_secret="coiNWOg4U0YOld9y")
 
 
 # ==========   ADMIN ============== >
@@ -392,18 +376,21 @@ def staff_login(request):
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            # Check if the user is a Staff
-            if hasattr(user, 'staff_profile'):
+            # Check if the user has a corresponding Staff profile
+            try:
+                staff = Staff.objects.get(staff=user)
                 auth_login(request, user)
                 # messages.success(request, 'Staff login successful.')
                 # Redirect to staff dashboard
                 return redirect('profile')
-            else:
-                messages.error(request, 'Invalid credentials.')
+            except Staff.DoesNotExist:
+                messages.error(
+                    request, 'Invalid credentials. You are not a staff member.')
         else:
             messages.error(request, 'Invalid username or password.')
     else:
         form = AuthenticationForm()
+
     return render(request, 'demo/auth/login.html', {'form': form})
 
 
@@ -412,8 +399,8 @@ def pending_flights(request):
     user = request.user
 
     # Filter flights where `approved` is False and `user` is the authenticated user
-    pending_flights = Flight_model.objects.filter(user=user, approved=False)
-
+    pending_flights = Flight_model.objects.filter(
+        user=user, approved=False).order_by('-departure_date')
     return render(request, 'demo/staff/pending_flights.html', {'pending_flights': pending_flights})
 
 
@@ -422,7 +409,8 @@ def approved_flights(request):
     user = request.user
 
     # Filter flights where `approved` is True and `user` is the authenticated user
-    approved_flights = Flight_model.objects.filter(user=user, approved=True)
+    approved_flights = Flight_model.objects.filter(
+        user=user, approved=True).order_by('-departure_date')
 
     return render(request, 'demo/staff/approved_flights.html', {'approved_flights': approved_flights})
 
@@ -465,7 +453,6 @@ def update_profile_picture(request):
 
 # end profile
 
-
 # Logout View
 @login_required
 def logout_view(request):
@@ -495,7 +482,6 @@ def update_price_increment(request):
 
 
 def demo(request):
-    # Retrieve data from the UI form
     user = request.user
     origin = request.POST.get("Origin")
     destination = request.POST.get("Destination")
@@ -504,7 +490,6 @@ def demo(request):
     passenger_count = request.POST.get("passengerCount")
     travel_class = request.POST.get("cabinClass")
 
-    # Prepare url parameters for search
     kwargs = {
         "originLocationCode": origin,
         "destinationLocationCode": destination,
@@ -512,7 +497,6 @@ def demo(request):
         "adults": passenger_count,
     }
 
-    # For a round trip, we use AI Trip Purpose Prediction
     tripPurpose = ""
     if return_date:
         kwargs["returnDate"] = return_date
@@ -523,7 +507,6 @@ def demo(request):
             "returnDate": return_date,
         }
         try:
-            # Calls Trip Purpose Prediction API
             trip_purpose_response = amadeus.travel.predictions.trip_purpose.get(
                 **kwargs_trip_purpose).data
             tripPurpose = trip_purpose_response["result"]
@@ -532,7 +515,6 @@ def demo(request):
                 request, error.response.result["errors"][0]["detail"])
             return render(request, "demo/home.html")
 
-    # Perform flight search based on previous inputs
     if origin and destination and departure_date:
         try:
             search_flights = amadeus.shopping.flight_offers_search.get(
@@ -542,19 +524,17 @@ def demo(request):
                 request, error.response.result["errors"][0]["detail"])
             return render(request, "demo/home.html")
 
-        # Check if an instance with the same fields already exists
         existing_flight = Flight_model.objects.filter(
             user=user,
             origin=origin,
             destination=destination,
             departure_date=departure_date,
-            return_date=return_date if return_date else None,  # Handle optional return_date
+            return_date=return_date if return_date else None,
             passenger_count=passenger_count,
             travel_class=travel_class,
         ).first()
 
         if not existing_flight:
-            # Create and save the Flight_model instance if it doesn't already exist
             Flight_model.objects.create(
                 user=user,
                 origin=origin,
@@ -565,74 +545,87 @@ def demo(request):
                 travel_class=travel_class,
             )
 
-        # Check if any search results match an approved flight
-        approved_flights = Flight_model.objects.filter(user=user,
-                                                       origin=origin,
-                                                       destination=destination,
-                                                       departure_date=departure_date,
-                                                       return_date=return_date if return_date else None,  # Handle optional return_date
-                                                       passenger_count=passenger_count,
-                                                       travel_class=travel_class,
-                                                       approved=True)
-        if approved_flights:
-            search_flights_returned = []
-            response = []
+        search_flights_returned = []
+        response = []
 
-            for flight in search_flights.data:
-                offer = Flight(flight).construct_flights()
-                search_flights_returned.append(offer)
+        for flight in search_flights.data:
+            offer = Flight(flight).construct_flights()
+            search_flights_returned.append(offer)
 
-            response = zip(search_flights_returned, search_flights.data)
+        response = zip(search_flights_returned, search_flights.data)
 
-            return render(
-                request,
-                "demo/results.html",
-                {
-                    "response": response,
-                    "origin": origin,
-                    "destination": destination,
-                    "departureDate": departure_date,
-                    "returnDate": return_date,
-                    "tripPurpose": tripPurpose,
-                },
-            )
+        return render(
+            request,
+            "demo/results.html",
+            {
+                "response": response,
+                "origin": origin,
+                "destination": destination,
+                "departureDate": departure_date,
+                "returnDate": return_date,
+                "tripPurpose": tripPurpose,
+            },
+        )
 
-        messages.error(
-            request, 'Your flight has not been approved yet.')
-        return render(request, "demo/home.html")
-
-    # Fallback to home page if required fields are not provided
     return render(request, "demo/home.html")
 
 
-# Step 1: Obtain the access token
 def get_access_token():
     try:
-        response = requests.post('https://api.amadeus.com/v1/security/oauth2/token',
+        response = requests.post('https://test.api.amadeus.com/v1/security/oauth2/token',
                                  data={
                                      'grant_type': 'client_credentials',
-                                     'client_id': settings.AMADEUS_CLIENT_ID,  # Fetching from environment variables
-                                     # Fetching from environment variables
+                                     'client_id': settings.AMADEUS_CLIENT_ID,
                                      'client_secret': settings.AMADEUS_CLIENT_SECRET
                                  })
-        response.raise_for_status()  # Check for errors
+        response.raise_for_status()
         token_data = response.json()
         return token_data['access_token']
     except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to get access token: {str(e)}")
         raise Exception(f"Failed to get access token: {str(e)}")
 
-
-# # Step 2: Update the book_flight view
 def book_flight(request, flight):
-    token = get_access_token()  # Get the access token from the helper function
-    headers = {
-        # Add the access token in the header
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
-    }
-
     try:
-        # Create a fake traveler profile for booking (you can update this as needed)
+        flight_data = ast.literal_eval(flight)
+        print(f"Processing flight data: {flight_data}")
+
+        # Extract flight details
+        departure_date = flight_data['itineraries'][0]['segments'][0]['departure']['at'].split('T')[0]
+        return_date = flight_data['itineraries'][-1]['segments'][-1]['arrival']['at'].split('T')[0] if len(flight_data['itineraries']) > 1 else None
+        passenger_count = len(flight_data['travelerPricings'])
+        travel_class = flight_data['travelerPricings'][0]['fareDetailsBySegment'][0]['cabin']
+
+        print(f"Extracted flight details: departure_date={departure_date}, return_date={return_date}, "
+              f"passenger_count={passenger_count}, travel_class={travel_class}")
+
+        # Check if the flight is approved using broader criteria
+        approved_flight_query = Flight_model.objects.filter(
+            user=request.user,
+            departure_date=departure_date,
+            return_date=return_date,
+            passenger_count=passenger_count,
+            travel_class__iexact=travel_class,
+            approved=True
+        )
+
+        print(f"Approved flight query: {approved_flight_query.query}")
+        approved_flight = approved_flight_query.first()
+
+        if not approved_flight:
+            logger.warning(f"No approved flight found for user {request.user.username}")
+            messages.error(request, 'Your flight has not been approved yet.')
+            return redirect('home')
+
+        print(f"Approved flight found: {approved_flight}")
+
+        # Proceed with booking if the flight is approved
+        token = get_access_token()
+        headers = {
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        }
+
         traveler = {
             "id": "1",
             "dateOfBirth": "1982-01-16",
@@ -640,56 +633,57 @@ def book_flight(request, flight):
             "gender": "MALE",
             "contact": {
                 "emailAddress": "jorge.gonzales833@telefonica.es",
-                "phones": [
-                    {
-                        "deviceType": "MOBILE",
-                        "countryCallingCode": "34",
-                        "number": "480080076",
-                    }
-                ],
+                "phones": [{"deviceType": "MOBILE", "countryCallingCode": "34", "number": "480080076"}],
             },
-            "documents": [
-                {
-                    "documentType": "PASSPORT",
-                    "birthPlace": "Madrid",
-                    "issuanceLocation": "Madrid",
-                    "issuanceDate": "2015-04-14",
-                    "number": "00000000",
-                    "expiryDate": "2025-04-14",
-                    "issuanceCountry": "ES",
-                    "validityCountry": "ES",
-                    "nationality": "ES",
-                    "holder": True,
-                }
-            ],
+            "documents": [{
+                "documentType": "PASSPORT",
+                "birthPlace": "Madrid",
+                "issuanceLocation": "Madrid",
+                "issuanceDate": "2015-04-14",
+                "number": "00000000",
+                "expiryDate": "2025-04-14",
+                "issuanceCountry": "ES",
+                "validityCountry": "ES",
+                "nationality": "ES",
+                "holder": True,
+            }],
         }
 
-        # Step 3: Confirm price and availability of the flight using the Amadeus API
         flight_price_confirmed = amadeus.shopping.flight_offers.pricing.post(
-            ast.literal_eval(flight)
+            flight_data
         ).data["flightOffers"]
 
-        # Step 4: Send the booking request with the access token
         response = requests.post(
-            'https://api.amadeus.com/v1/booking/flight-orders',
+            'https://test.api.amadeus.com/v1/booking/flight-orders',
             headers=headers,
             json={"data": {"type": "flight-order",
                            "flightOffers": flight_price_confirmed, "travelers": [traveler]}}
         )
-        response.raise_for_status()  # Check if the request was successful
+        response.raise_for_status()
 
-        # Parse the booking response and render the results page
         order = response.json()["data"]
         passenger_name_record = [Booking(order).construct_booking()]
 
+        # Send email with flight details
+        # send_flight_email(request.user,  departure_date,
+        #                   return_date, travel_class, passenger_name_record)
+
+        logger.info(f"Flight booked successfully for user {request.user.username}")
         return render(request, "demo/book_flight.html", {"response": passenger_name_record})
 
     except requests.exceptions.HTTPError as http_err:
+        logger.error(f"HTTP error occurred: {http_err}")
         messages.error(request, f"Booking failed: {str(http_err)}")
-    except (ResponseError, KeyError, AttributeError) as error:
-        messages.error(request, f"Booking failed: {str(error)}")
+    except ResponseError as amadeus_err:
+        logger.error(f"Amadeus API error: {amadeus_err}")
+        messages.error(request, f"Amadeus API error: {str(amadeus_err)}")
+    except Exception as error:
+        logger.exception(f"An unexpected error occurred: {error}")
+        messages.error(request, f"An error occurred: {str(error)}")
 
-    return render(request, "demo/book_flight.html")
+    return redirect('home')
+
+
 
 
 def origin_airport_search(request):
@@ -861,7 +855,7 @@ def send_flight_email(user, origin, destination, departure_date, return_date, tr
 
     # Prepare the email subject and message
     subject = 'Your Flight Search Details'
-    message = render_to_string('emails/flight_details_email.html', {
+    message = render_to_string('demo/email/flight_booking_email.html', {
         'first_name': first_name,
         'last_name': last_name,
         'email': email,

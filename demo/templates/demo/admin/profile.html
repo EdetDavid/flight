@@ -1,108 +1,20 @@
 {% extends 'demo/admin/base.html' %}
 {% load static %}
-
 {% block title %}Profile{% endblock %}
-
-{% block styles %}
-<style>
-    .profile-container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #fff;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .profile-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-    }
-
-    .profile-picture {
-        border-radius: 50%;
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-    }
-
-    .profile-info {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .info-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        background-color: #f8f9fa;
-        border-radius: 5px;
-    }
-
-    .form-group {
-        margin-top: 20px;
-    }
-
-    .custom-file-input {
-        border: 1px solid #ced4da;
-        padding: 10px;
-        border-radius: 5px;
-    }
-
-    .custom-file-label {
-        display: block;
-        margin-top: 5px;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-        padding: 10px 20px;
-        border-radius: 5px;
-    }
-
-    .error-message {
-        color: red;
-        font-size: 14px;
-        margin-top: 5px;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
-    
-    <!-- Bootstrap & FontAwesome -->
+    {% load static %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-    
-    <!-- Custom CSS -->
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(to right, #e9ecef, #ffffff);
-            margin: 0;
-            padding: 0;
-            color: #495057;
-        }
-
         .profile-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px;
+            padding: 5%;
             max-width: 600px; 
-            margin: 100px auto;
+            width: 90%;
+            margin: 5% auto;
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
@@ -111,6 +23,7 @@
         .profile-header {
             text-align: center;
             margin-bottom: 30px;
+            width: 100%;
         }
 
         .profile-picture {
@@ -134,7 +47,7 @@
         }
 
         .profile-info h2 {
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: #007bff;
             font-weight: 600;
             margin-bottom: 20px;
@@ -142,7 +55,7 @@
 
         .info-item {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             margin-bottom: 15px; 
             padding: 10px;
             border-radius: 8px;
@@ -157,8 +70,7 @@
         .info-item label {
             font-weight: 500;
             color: #343a40;
-            margin-right: 15px;
-            width: 120px;
+            margin-bottom: 5px;
         }
 
         .info-item span {
@@ -210,23 +122,42 @@
             border: 3px solid #007bff;
             margin-right: 15px;
         }
+
+        @media (min-width: 768px) {
+            .profile-container {
+                padding: 40px;
+            }
+
+            .profile-info h2 {
+                font-size: 2.5rem;
+            }
+
+            .info-item {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .info-item label {
+                margin-right: 15px;
+                width: 120px;
+                margin-bottom: 0;
+            }
+        }
     </style>
-</head>
-<body class="bg-dark">
-
-
-
     <!-- Profile Section -->
     <div class="profile-container">
         <div class="profile-header">
             {% if user.profile.profile_picture %}
-                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-picture">
+                <img src="{{ user.profile.profile_picture.url }}"
+                     alt="Profile Picture"
+                     class="profile-picture">
             {% else %}
-                <img src="{% static 'demo/default_profile_picture.jpg' %}" alt="Default Profile Picture" class="profile-picture">
+                <img src="{% static 'demo/default_profile_picture.jpg' %}"
+                     alt="Default Profile Picture"
+                     class="profile-picture">
             {% endif %}
             <h2>{{ user.username }}'s Profile</h2>
         </div>
-
         <div class="profile-info">
             <div class="info-item">
                 <label for="username">Username:</label>
@@ -249,24 +180,27 @@
                 <span>{{ user.phone }}</span>
             </div>
         </div>
-
         <!-- Profile Picture Update Form -->
-        <form method="POST" enctype="multipart/form-data" class="profile-form" action="{% url 'admin_update_profile_picture' %}">
+        <form method="POST"
+              enctype="multipart/form-data"
+              class="profile-form"
+              action="{% url 'admin_update_profile_picture' %}">
             {% csrf_token %}
             <div class="form-group">
                 <label for="profile_picture" class="form-label">Update Profile Picture:</label>
                 <div class="custom-file">
-                    <input type="file" name="profile_picture" id="profile_picture" class="custom-file-input" onchange="updateFileName()">
+                    <input type="file"
+                           name="profile_picture"
+                           id="profile_picture"
+                           class="custom-file-input"
+                           onchange="updateFileName()">
                     <label class="custom-file-label" for="profile_picture">Choose file</label>
                 </div>
-                {% if error_message %}
-                    <div class="error-message">{{ error_message }}</div>
-                {% endif %}
+                {% if error_message %}<div class="error-message">{{ error_message }}</div>{% endif %}
             </div>
             <button type="submit" class="btn btn-primary">Upload</button>
         </form>
     </div>
-
     <!-- Bootstrap JS & Custom Script -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -277,7 +211,4 @@
             document.querySelector('.custom-file-label').textContent = fileName;
         }
     </script>
-</body>
-</html>
-
 {% endblock %}

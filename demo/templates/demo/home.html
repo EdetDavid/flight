@@ -36,7 +36,7 @@
       href="{% static 'demo/style.css' %}"
     />
 
-    <style>
+<style>
       /* Custom Styles */
       body {
         font-family: "Arial", sans-serif;
@@ -227,6 +227,15 @@
       opacity: 1;
     }
   }
+
+  .navbar-toggler,
+.navbar-toggler:focus,
+.navbar-toggler:active,
+.navbar-toggler-icon:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
     </style>
 <script>
   function checkAuth(event) {
@@ -259,8 +268,10 @@
         <img src="{% static 'images/seplat.png' %}" width="40" height="40" alt="Seplat Logo" />
         Seplat Booking
       </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
+      <button class="navbar-toggler " type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon">
+          <i class="fas fa-bars text-dark"> </i>
+        </span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mx-auto">

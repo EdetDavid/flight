@@ -1,5 +1,5 @@
 {% load static %}
-{% load humanize %}  <!-- Load the humanize template tag library -->
+{% load humanize %} <!-- Load the humanize template tag library -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +33,7 @@
         .price {
             font-size: 24px;
             font-weight: bold;
-            color: #007bff;
+            color: #28a745;
         }
 
         .table thead th {
@@ -45,6 +45,25 @@
         .table tbody tr:hover {
             background-color: #f1f1f1;
         }
+
+    /*    .book-button {
+            background-color: #28a745;
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .book-button:hover {
+            background-color: #218838;
+            color: white;
+            transform: scale(1.05);
+        }
+
+
+        */
 
         .book-button {
             background-color: #e01409;
@@ -68,11 +87,24 @@
             .table-responsive {
                 overflow-x: auto;
             }
+            .card-body {
+                padding: 10px;
+            }
+            .book-button {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
         }
-        
+
         /* Center align button in table cell */
         .text-center-vertical {
             vertical-align: middle;
+        }
+
+        .loading-message {
+            font-size: 20px;
+            text-align: center;
+            color: #007bff;
         }
     </style>
 </head>
@@ -108,14 +140,14 @@
                                     <td>
                                         <div>
                                             <p>
-                                                <img src="{{ r.0firstFlightAirlineLogo }}" alt="{{ r.0firstFlightAirline }}" style="height: 30px;" /> 
+                                                <img src="{{ r.0firstFlightAirlineLogo }}" alt="{{ r.0firstFlightAirline }} logo" style="height: 30px;" /> 
                                                 {{ r.0firstFlightDepartureDate }} {{ r.0firstFlightDepartureAirport }}
                                                 <span class="text-info" data-toggle="tooltip" title="{{ r.0firstFlightArrivalDuration }}">&#10230;</span> 
                                                 {{ r.0firstFlightArrivalAirport }} {{ r.0firstFlightArrivalDate }}
                                             </p>
                                             {% if r.0secondFlightDepartureAirport %}
                                                 <p>
-                                                    <img src="{{ r.0secondFlightAirlineLogo }}" alt="{{ r.0secondFlightAirline }}" style="height: 30px;" />
+                                                    <img src="{{ r.0secondFlightAirlineLogo }}" alt="{{ r.0secondFlightAirline }} logo" style="height: 30px;" />
                                                     {{ r.0secondFlightDepartureDate }} {{ r.0secondFlightDepartureAirport }}
                                                     <span class="text-info" data-toggle="tooltip" title="{{ r.0secondFlightArrivalDuration }}">&#10230;</span>
                                                     {{ r.0secondFlightArrivalAirport }} {{ r.0secondFlightArrivalDate }}
@@ -128,14 +160,14 @@
                                         {% if r.1firstFlightDepartureAirport %}
                                             <div>
                                                 <p>
-                                                    <img src="{{ r.1firstFlightAirlineLogo }}" alt="{{ r.1firstFlightAirline }}" style="height: 30px;" />
+                                                    <img src="{{ r.1firstFlightAirlineLogo }}" alt="{{ r.1firstFlightAirline }} logo" style="height: 30px;" />
                                                     {{ r.1firstFlightDepartureDate }} {{ r.1firstFlightDepartureAirport }}
                                                     <span class="text-info" data-toggle="tooltip" title="{{ r.1firstFlightArrivalDuration }}">&#10230;</span>
                                                     {{ r.1firstFlightArrivalAirport }} {{ r.1firstFlightArrivalDate }}
                                                 </p>
                                                 {% if r.1secondFlightDepartureAirport %}
                                                     <p>
-                                                        <img src="{{ r.1secondFlightAirlineLogo }}" alt="{{ r.1secondFlightAirline }}" style="height: 30px;" />
+                                                        <img src="{{ r.1secondFlightAirlineLogo }}" alt="{{ r.1secondFlightAirline }} logo" style="height: 30px;" />
                                                         {{ r.1secondFlightDepartureDate }} {{ r.1secondFlightDepartureAirport }}
                                                         <span class="text-info" data-toggle="tooltip" title="{{ r.1secondFlightArrivalDuration }}">&#10230;</span>
                                                         {{ r.1secondFlightArrivalAirport }} {{ r.1secondFlightArrivalDate }}
@@ -156,7 +188,9 @@
                 </table>
             </div>
         {% else %}
-            <h4 class="text-center">No flights found for this itinerary</h4>
+            <div class="loading-message">
+                <h4>No flights found for this itinerary</h4>
+            </div>
         {% endif %}
     </div>
 
@@ -170,4 +204,3 @@
     </script>
 </body>
 </html>
-
