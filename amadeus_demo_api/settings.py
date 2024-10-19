@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    "widget_tweaks",
     'demo',
     'hotel',
 ]
@@ -61,14 +62,17 @@ TEMPLATE_DIRS = (
 
 AUTH_USER_MODEL = 'demo.User'  # Custom user model
 
-# Email settings using environment variables
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = env('EMAIL_HOST')
-EMAIL_PORT = env('EMAIL_PORT', default=587)
-EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
+
+# AWS SIMPLE EMAIL SERVICE CONFIGURATION
+
+EMAIL_BACKEND = 'django_ses.SESBackend'
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY =env('AWS_SECRET_ACCESS_KEY')
+AWS_SES_REGION_NAME =env('AWS_SES_REGION_NAME')
+AWS_SES_REGION_ENDPOINT =env('AWS_SES_REGION_ENDPOINT')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
+
+
 
 TEMPLATES = [
     {
@@ -95,6 +99,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
