@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Your Booking Confirmation</title>
+        <link rel="stylesheet"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+              integrity="sha384-dG5GVdO8bl93+7Z7E0Nf5ftWZnR6gkAaCZ9YlM0zzE68l9Rkg0g5ogCz0P+Az8C1"
+              crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="{% static 'demo/style.css' %}">
+        <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #495057;
+            margin: 0 auto !important;
+        }
+        .container {
+            margin-top: 30px;
+            max-width: 900px;
+        }
+        .card {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            border-bottom: 1px solid #0056b3;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border-radius: 10px 10px 0 0;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .text-danger {
+            color: #dc3545;
+        }
+        .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .card-text h4 {
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+        .card-text img {
+            max-height: 30px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .alert {
+            border-radius: 10px;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .modal-body {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .booking-details {
+            margin-bottom: 30px;
+        }
+        .booking-details h3 {
+            color: #007bff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .btn {
+            border-radius: 20px;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .hr-style {
+            border: none;
+            border-top: 2px solid #007bff;
+            margin: 20px 0;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            {% if messages %}
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if response %}
+                <div class="booking-details">
+                    {% for r in response %}
+                        <h3>Your Booking Confirmation</h3>
+                        <div class="card">
+                            <div class="card-header">Booking Information</div>
+                            <div class="card-body">
+                                <p>
+                                    Status: <span class="text-danger">{{ r.confirmed }}</span>
+                                </p>
+                                <p>
+                                    Booking Reference: <span class="text-danger">{{ r.reference }}</span>
+                                </p>
+                                <p>
+                                    Document Issued At: <b>{{ r.created }}</b>
+                                </p>
+                                <p>
+                                    Price: <span class="price">${{ r.price }}</span>
+                                </p>
+                                {% if r.0firstFlightDepartureDate %}
+                                    <div class="card">
+                                        <div class="card-header">Departure Flight</div>
+                                        <div class="card-body">
+                                            <p>Departure Date: {{ r.0departureDate }}</p>
+                                            <div class="card-text">
+                                                <h4>
+                                                    <img src="{{ r.0firstFlightAirlineLogo }}"
+                                                         alt="{{ r.0firstFlightAirline }}">
+                                                    {{ r.0firstFlightDepartureDate }} {{ r.0firstFlightDepartureAirport }}
+                                                    &#10230; {{ r.0firstFlightArrivalAirport }} {{ r.0firstFlightArrivalDate }}
+                                                </h4>
+                                                {% if r.0secondFlightDepartureAirport %}
+                                                    <h4>
+                                                        <img src="{{ r.0secondFlightAirlineLogo }}"
+                                                             alt="{{ r.0secondFlightAirline }}">
+                                                        {{ r.0secondFlightDepartureDate }} {{ r.0secondFlightDepartureAirport }}
+                                                        &#10230; {{ r.0secondFlightArrivalAirport }} {{ r.0secondFlightArrivalDate }}
+                                                    </h4>
+                                                {% endif %}
+                                            </div>
+                                            {% if r.1firstFlightDepartureAirport %}
+                                                <hr class="hr-style">
+                                                <p>Return Flight Date: {{ r.1departureDate }}</p>
+                                                <div class="card-text">
+                                                    <h4>
+                                                        <img src="{{ r.1firstFlightAirlineLogo }}"
+                                                             alt="{{ r.1firstFlightAirline }}">
+                                                        {{ r.1firstFlightDepartureDate }} {{ r.1firstFlightDepartureAirport }}
+                                                        &#10230; {{ r.1firstFlightArrivalAirport }} {{ r.1firstFlightArrivalDate }}
+                                                    </h4>
+                                                    {% if r.1secondFlightDepartureAirport %}
+                                                        <h4>
+                                                            <img src="{{ r.1secondFlightAirlineLogo }}"
+                                                                 alt="{{ r.1secondFlightAirline }}">
+                                                            {{ r.1secondFlightDepartureDate }} {{ r.1secondFlightDepartureAirport }}
+                                                            &#10230; {{ r.1secondFlightArrivalAirport }} {{ r.1secondFlightArrivalDate }}
+                                                        </h4>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center">No booking details available.</p>
+            {% endif %}
+        </div>
+        <script src="https://code.jquery.com/jquery-3.4.1.js"
+                integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+                crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+                integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30="
+                crossorigin="anonymous"></script>
+    </body>
+</html>

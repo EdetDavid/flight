@@ -1,0 +1,339 @@
+{% extends 'demo/admin/base.html' %}
+{% load static %}
+{% block title %}Approve Flights{% endblock %}
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <style>
+    .container{
+        max-width:95% !important;
+        width: 100%;
+        display: flex;
+        
+        margin: 0 auto;
+        justify-content: center !important;
+        align-items: center !important;
+        
+    }
+
+    .table-container {
+        background: #ffffff;
+        border-radius: 12px;
+        overflow: scroll;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-top: 30px;
+        
+    }
+
+    h1 {
+        font-size: 32px;
+        margin-bottom: 25px;
+        color: #007bff;
+        text-align: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    thead {
+        background: #007bff;
+        color: #ffffff;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+    }
+
+    th {
+        font-weight: bold;
+        border-bottom: 3px solid #e1e1e1;
+        font-size: 18px;
+    }
+
+    td {
+        border-bottom: 2px solid #e1e1e1;
+        font-size: 16px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .btn-approve {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+        background-color: #28a745;
+        color: white;
+    }
+
+    .btn-back {
+        display: inline-block;
+        background-color: #007bff;
+        color: #ffffff;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 16px;
+        text-decoration: none;
+        margin-bottom: 20px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+    }
+
+    .btn-back:hover {
+        background-color: #0056b3;
+        transform: translateY(-3px);
+    }
+
+    .profile-img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .status-pending {
+        background-color: #ffdd00;
+        color: #000;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 5px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .status-pending::before {
+        content: "\26A0";
+        font-size: 18px;
+        margin-right: 5px;
+    }
+
+    .status-approved {
+        background-color: #28a745;
+        color: #fff;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .filters {
+        margin-bottom: 20px;
+    }
+
+    .filters input, .filters select {
+        padding: 8px;
+        margin-right: 10px;
+    }
+
+    #errorMessage {
+        color: red;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+        
+         /* Add Scroll on Mobile */
+         .table-container {
+            overflow-x: auto; /* Horizontal scroll for small screens */
+            width:  80vw !important;
+        }
+
+        thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+        
+        tr {
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        
+        td {
+            border: none;
+            position: relative;
+            padding-left: 50%;
+        }
+        
+        td:before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            width: 45%;
+            padding-left: 15px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+    }
+    
+    </style>
+    <a href="{% url 'admin_profile' %}" class="btn-back">Back to Dashboard</a>
+    <div class="container">
+        <div class="table-container">
+            <h1>Pending Flight Approvals</h1>
+            <div class="filters">
+                <input type="text" id="nameFilter" placeholder="Filter by name">
+                <input type="text" id="originFilter" placeholder="Filter by origin">
+                <input type="text"
+                       id="destinationFilter"
+                       placeholder="Filter by destination">
+                <select id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                </select>
+            </div>
+            <form method="post" action="{% url 'approve_flight' %}" id="approvalForm">
+                {% csrf_token %}
+                <table id="flightTable">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Profile Picture</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Origin</th>
+                            <th>Destination</th>
+                            <th>Departure Date</th>
+                            <th>Return Date</th>
+                            <th>Passenger Count</th>
+                            <th>Travel Class</th>
+                            <th>Approval Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flight in pending_flights %}
+                            <tr>
+                                <td data-label="Select">
+                                    <input type="checkbox" name="flight_ids" value="{{ flight.id }}" />
+                                </td>
+                                <td data-label="Profile Picture">
+                                    {% if flight.user.profile.profile_picture %}
+                                        <img src="{{ flight.user.profile.profile_picture.url }}"
+                                             alt="Profile Picture"
+                                             class="profile-img" />
+                                    {% else %}
+                                        <img src="{% static 'default.png' %}"
+                                             alt="Default Profile Picture"
+                                             class="profile-img" />
+                                    {% endif %}
+                                </td>
+                                <td data-label="First Name">{{ flight.user.first_name }}</td>
+                                <td data-label="Last Name">{{ flight.user.last_name }}</td>
+                                <td data-label="Origin">{{ flight.origin }}</td>
+                                <td data-label="Destination">{{ flight.destination }}</td>
+                                <td data-label="Departure Date">{{ flight.departure_date|date:"M d, Y" }}</td>
+                                <td data-label="Return Date">{{ flight.return_date|date:"M d, Y" }}</td>
+                                <td data-label="Passenger Count">{{ flight.passenger_count }}</td>
+                                <td data-label="Travel Class">{{ flight.travel_class }}</td>
+                                <td data-label="Approval Status">
+                                    {% if flight.approved %}
+                                        <span class="status-approved">Approved</span>
+                                    {% else %}
+                                        <span class="status-pending">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="11">No flights pending approval.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div style="text-align: center; margin-top: 20px">
+                    <button type="submit"
+                            name="action"
+                            value="approve"
+                            class="btn-approve"
+                            id="approveButton">Approve Selected</button>
+                </div>
+                <div class="loading" id="loadingIndicator">Processing...</div>
+                <div id="errorMessage"></div>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('approveButton').addEventListener('click', function(e) {
+            e.preventDefault();
+            var checkedBoxes = document.querySelectorAll('input[name="flight_ids"]:checked');
+            if (checkedBoxes.length === 0) {
+                document.getElementById('errorMessage').textContent = 'Please select at least one flight to approve.';
+                return;
+            }
+            if (confirm('Are you sure you want to approve the selected flights?')) {
+                document.getElementById('loadingIndicator').style.display = 'block';
+                document.getElementById('approvalForm').submit();
+            }
+        });
+
+        // Filtering functionality
+        function applyFilters() {
+            var nameFilter = document.getElementById('nameFilter').value.toLowerCase();
+            var originFilter = document.getElementById('originFilter').value.toLowerCase();
+            var destinationFilter = document.getElementById('destinationFilter').value.toLowerCase();
+            var statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+
+            var rows = document.querySelectorAll('#flightTable tbody tr');
+            rows.forEach(function(row) {
+                var firstName = row.querySelector('td[data-label="First Name"]').textContent.toLowerCase();
+                var lastName = row.querySelector('td[data-label="Last Name"]').textContent.toLowerCase();
+                var origin = row.querySelector('td[data-label="Origin"]').textContent.toLowerCase();
+                var destination = row.querySelector('td[data-label="Destination"]').textContent.toLowerCase();
+                var status = row.querySelector('td[data-label="Approval Status"] span').textContent.toLowerCase();
+
+                var nameMatch = firstName.includes(nameFilter) || lastName.includes(nameFilter);
+                var originMatch = origin.includes(originFilter);
+                var destinationMatch = destination.includes(destinationFilter);
+                var statusMatch = statusFilter === '' || status.includes(statusFilter);
+
+                row.style.display = (nameMatch && originMatch && destinationMatch && statusMatch) ? '' : 'none';
+            });
+        }
+
+        document.getElementById('nameFilter').addEventListener('input', applyFilters);
+        document.getElementById('originFilter').addEventListener('input', applyFilters);
+        document.getElementById('destinationFilter').addEventListener('input', applyFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+        // Sorting functionality
+        document.querySelectorAll('#flightTable th').forEach(function(th) {
+            th.addEventListener('click', function() {
+                var table = th.closest('table');
+                Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
+                    .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+                    .forEach(function(tr) { table.appendChild(tr) });
+            });
+        });
+
+        function comparer(index, asc) {
+            return function(a, b) {
+                var valA = getCellValue(a, index), valB = getCellValue(b, index);
+                return (valA === '' || valB === '' || (!isNaN(valA) && !isNaN(valB)))
+                    ? valA - valB
+                    : (asc ? 1 : -1) * (valA.toString().localeCompare(valB));
+            };
+        }
+
+        function getCellValue(tr, idx) { return tr.children[idx].innerText || tr.children[idx].textContent; }
+    </script>
+{% endblock %}
