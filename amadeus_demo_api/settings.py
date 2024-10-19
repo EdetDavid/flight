@@ -21,7 +21,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-HOST_URL = env('HOST_URL', default='localhost')
+# HOST_URL = env('HOST_URL', default='localhost')
 # ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', HOST_URL]
 ALLOWED_HOSTS = ['*']
 AMADEUS_CLIENT_ID = env('AMADEUS_CLIENT_ID')
@@ -63,15 +63,15 @@ TEMPLATE_DIRS = (
 AUTH_USER_MODEL = 'demo.User'  # Custom user model
 
 
-# AWS SIMPLE EMAIL SERVICE CONFIGURATION
-
-EMAIL_BACKEND = 'django_ses.SESBackend'
+# AWS Credentials and SES Configuration
 AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY =env('AWS_SECRET_ACCESS_KEY')
-AWS_SES_REGION_NAME =env('AWS_SES_REGION_NAME')
-AWS_SES_REGION_ENDPOINT =env('AWS_SES_REGION_ENDPOINT')
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+AWS_SES_REGION_NAME = env('AWS_SES_REGION_NAME')
+AWS_SES_REGION_ENDPOINT = env('AWS_SES_REGION_ENDPOINT')
 
+# Email Backend Configuration
+EMAIL_BACKEND = 'django_ses.SESBackend'
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 
 
 TEMPLATES = [
