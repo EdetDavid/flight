@@ -111,7 +111,7 @@ WSGI_APPLICATION = "flight.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # sqlite database
-
+"""
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -120,7 +120,7 @@ DATABASES = {
 }
 
 
-"""
+
 # Vercel Database
 DATABASES = {
     'default': {
