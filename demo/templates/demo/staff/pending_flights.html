@@ -1,0 +1,106 @@
+{% extends 'demo/staff/base.html' %}
+{% load static %}
+{% block title %}Pending Flights{% endblock %}
+{% block content %}
+    {% load static %}
+    {% load humanize %}
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <div style="max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1)">
+        <a href="{% url 'admin_dashboard' %}"
+           style="display: inline-block;
+                  background-color: #007bff;
+                  color: #ffffff;
+                  padding: 10px 20px;
+                  border-radius: 5px;
+                  font-size: 16px;
+                  text-decoration: none;
+                  margin-bottom: 20px;
+                  transition: background-color 0.3s ease, transform 0.3s ease;
+                  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2)"
+           onmouseover="this.style.backgroundColor='#0056b3'; this.style.transform='translateY(-2px)';"
+           onmouseout="this.style.backgroundColor='#007bff'; this.style.transform='translateY(0)';">
+            Back to Dashboard
+        </a>
+        <h1 style="font-size: 28px;
+                   margin-bottom: 20px;
+                   color: #007bff;
+                   text-align: center">Pending Flights</h1>
+        <table style=" width: 100%; border-collapse: collapse; margin-top: 20px; ">
+            <thead style=" background-color: #007bff; color: #ffffff; ">
+                <tr>
+                    <th style="padding: 12px;
+                               text-align: left;
+                               font-weight: bold;
+                               border-bottom: 2px solid #e1e1e1;
+                               font-size: 16px">Origin</th>
+                    <th style="padding: 12px;
+                               text-align: left;
+                               font-weight: bold;
+                               border-bottom: 2px solid #e1e1e1;
+                               font-size: 16px">Destination</th>
+                    <th style="padding: 12px;
+                               text-align: left;
+                               font-weight: bold;
+                               border-bottom: 2px solid #e1e1e1;
+                               font-size: 16px">Departure Date</th>
+                    <th style="padding: 12px;
+                               text-align: left;
+                               font-weight: bold;
+                               border-bottom: 2px solid #e1e1e1;
+                               font-size: 16px">Return Date</th>
+                    <th style="padding: 12px;
+                               text-align: left;
+                               font-weight: bold;
+                               border-bottom: 2px solid #e1e1e1;
+                               font-size: 16px">Travel Class</th>
+                    <th style="padding: 12px;
+                               text-align: left;
+                               font-weight: bold;
+                               border-bottom: 2px solid #e1e1e1;
+                               font-size: 16px">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in pending_flights %}
+                    <tr>
+                        <td style="padding: 12px;
+                                   border-bottom: 1px solid #e1e1e1;
+                                   font-size: 14px">{{ flight.origin }}</td>
+                        <td style="padding: 12px;
+                                   border-bottom: 1px solid #e1e1e1;
+                                   font-size: 14px">{{ flight.destination }}</td>
+                        <td style="padding: 12px;
+                                   border-bottom: 1px solid #e1e1e1;
+                                   font-size: 14px">{{ flight.departure_date }}</td>
+                        <td style="padding: 12px;
+                                   border-bottom: 1px solid #e1e1e1;
+                                   font-size: 14px">{{ flight.return_date }}</td>
+                        <td style="padding: 12px;
+                                   border-bottom: 1px solid #e1e1e1;
+                                   font-size: 14px">{{ flight.travel_class }}</td>
+                        <td style="padding: 12px;
+                                   border-bottom: 1px solid #e1e1e1;
+                                   font-size: 14px">₦ {{ flight.price|floatformat:0|intcomma }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5"
+                            style="text-align: center;
+                                   padding: 20px;
+                                   font-size: 14px">No pending flights</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

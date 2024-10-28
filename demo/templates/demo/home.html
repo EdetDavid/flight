@@ -1,0 +1,583 @@
+{% load static %}
+{% load user_type_urls %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Seplat Booking - Your Next Adventure Awaits</title>
+    <link rel="icon"
+          href="{% static 'images/seplat.png' %}"
+          type="image/x-icon">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <!-- jQuery UI CSS (for Autocomplete) -->
+    <link rel="stylesheet"
+          href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'demo/style.css' %}" />
+    <style>
+      /* Custom Styles */
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f4f4f4;
+      }
+
+      .navbar {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .hero-section {
+        background: url("{% static 'images/background.jpg' %}") no-repeat center
+          center fixed;
+        background-size: cover;
+        color: white;
+        padding: 100px 0;
+        text-align: center;
+        height: 400px;
+      }
+
+      .search-section {
+        background-color: #f8f9fa;
+        padding: 50px 0;
+      }
+
+      .card {
+        border-radius: 10px;
+      }
+
+      #inputOrigin,
+      #inputDestination {
+    text-transform: uppercase;
+} 
+
+
+      .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+      }
+
+      .btn-primary:hover {
+        background-color: #0069d9;
+        border-color: #0062cc;
+      }
+
+      /* Autocomplete styling */
+      .ui-autocomplete {
+        z-index: 1000;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .ui-autocomplete .ui-menu-item {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .ui-autocomplete .ui-menu-item:hover,
+      .ui-autocomplete .ui-menu-item.ui-state-focus {
+        background-color: #f5f5f5;
+      }
+
+      /* Footer styles */
+      .footer {
+        background-color: #f8f9fa;
+        padding: 20px 0;
+        color: #6c757d;
+      }
+
+      .footer a {
+        color: #007bff;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+        /* Custom Stylish Navbar */
+  .navbar {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+  }
+
+
+  
+  .navbar:hover {
+    background: rgba(255, 255, 255, 1);
+  }
+
+  .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff;
+  }
+
+  .navbar-nav .nav-link {
+    font-size: 1.1rem;
+    margin-left: 1.5rem;
+    color: #555;
+    transition: color 0.3s ease;
+  }
+
+  .navbar-nav .nav-link:hover {
+    color: #007bff;
+  }
+
+  .navbar-toggler {
+    border: none;
+  }
+
+  .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;...");
+  }
+
+  /* Stylish Cart Icon */
+  .navbar-nav .fa-shopping-cart {
+    font-size: 1.3rem;
+    color: #ffcc00;
+  }
+
+  /* Additional Styling for a Better UX */
+  .navbar-collapse {
+    justify-content: center;
+  }
+
+   /* Stylish Login Button */
+   .navbar .login-btn {
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    color: white;
+    background-color: #007bff;
+    transition: background-color 0.3s ease;
+  }
+
+  .navbar .login-btn:hover {
+    background-color: #0056b3;
+  }
+
+  /* Username Display after Login */
+  .navbar .username-text {
+    font-size: 1.1rem;
+    color: #007bff;
+    margin-right: 1rem;
+  }
+
+  .navbar .username-dropdown {
+    font-size: 1rem;
+    color: #555;
+  }
+
+  .navbar .dropdown-menu a:hover {
+    background-color: #f0f0f0;
+  }
+   /* Error Message Styling */
+  .error-message {
+    background-color: #fdd; /* Light red background */
+    border: 1px solid #faa; /* Red border */
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+    color: #a00; /* Dark red text */
+    max-width: 1000px;
+    margin: 20px auto; /* Centering the error message */
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .error-message ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .error-message li {
+    color: #a00; /* Dark red text */
+    font-weight: bold;
+  }
+
+  /* Animation for Error Message */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .navbar-toggler,
+.navbar-toggler:focus,
+.navbar-toggler:active,
+.navbar-toggler-icon:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+    </style>
+    <script>
+  function checkAuth(event) {
+    // Check if user is authenticated
+    var isAuthenticated = "{{ user.is_authenticated }}";
+    
+    // If user is not authenticated, prevent form submission and display message
+    if (isAuthenticated === "False") {
+      event.preventDefault(); // Prevent form submission
+      
+      // Show the message box
+      var messageBox = document.getElementById("authMessage");
+      messageBox.style.display = "block";
+      
+      // Redirect to login page after 2 seconds
+      setTimeout(function() {
+        window.location.href = "{% url 'login' %}";
+      }, 2000); // 2-second delay before redirect
+    }
+  }
+    </script>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+      <a class="navbar-brand" href="{% url 'home' %}">
+        <img src="{% static 'images/seplat.png' %}"
+             width="40"
+             height="40"
+             alt="Seplat Logo" />
+        Seplat Booking
+      </a>
+      <button class="navbar-toggler "
+              type="button"
+              data-toggle="collapse"
+              data-target="#navbarNav">
+        <span class="navbar-toggler-icon">
+          <i class="fas fa-bars text-dark"> </i>
+        </span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'home' %}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Flights</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Hotels</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link"
+               href="#"
+               data-toggle="modal"
+               data-target="#cartModal">
+              <i class="fas fa-shopping-cart"></i>
+            </a>
+          </li>
+        </ul>
+        <!-- Login Button or Username Display -->
+        <ul class="navbar-nav ml-auto">
+          {% if user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a class="nav-link username-text dropdown-toggle"
+                 href="#"
+                 id="userDropdown"
+                 role="button"
+                 data-toggle="dropdown"
+                 aria-haspopup="true"
+                 aria-expanded="false">Signed in as: {{ user.username }}</a>
+              <div class="dropdown-menu dropdown-menu-right username-dropdown"
+                   aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="{% get_profile_url user %}">Profile</a>
+                <a class="dropdown-item" href="{% url 'logout' %} ">Logout</a>
+              </div>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="btn login-btn" href="{% url 'login' %}">Login</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+    <!-- Cart Modal -->
+    <div class="modal fade"
+         id="cartModal"
+         tabindex="-1"
+         aria-labelledby="cartModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cartModalLabel">Your Cart</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Your cart is currently empty.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Continue Shopping</button>
+            <button type="button" class="btn btn-primary">Checkout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <h1 class="display-4">Discover Your Next Destination</h1>
+        <p class="lead">Book flights, hotels, and car rentals all in one place.</p>
+      </div>
+    </section>
+    <!-- Search Section -->
+    <section id="search" class="search-section">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-10">
+            <div class="card shadow-sm">
+              <div class="card-body p-4">
+                <h2 class="text-center mb-4">Where would you like to go?</h2>
+                <form action="" method="POST" id="form_id" onsubmit="checkAuth(event)">
+                  {% csrf_token %}
+                  <div id="authMessage"
+                       style="display: none;
+                              text-align: center;
+                              color: red;
+                              font-size: 16px;
+                              background-color: #f8d7da;
+                              padding: 10px;
+                              border-radius: 5px;
+                              margin-top: 10px">
+                    You need to log in to submit the form. Redirecting to login page...
+                  </div>
+                  {% if messages %}
+                    <div class="error-message">
+                      <ul>
+                        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+                      </ul>
+                    </div>
+                  {% endif %}
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label for="inputOrigin">From</label>
+                      <input type="text"
+                             name="Origin"
+                             id="inputOrigin"
+                             class="form-control"
+                             placeholder="Enter city or airport"
+                             required
+                             autofocus />
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="inputDestination">To</label>
+                      <input type="text"
+                             name="Destination"
+                             id="inputDestination"
+                             class="form-control"
+                             placeholder="Enter city or airport"
+                             required />
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group col-md-3">
+                      <label for="idDeparturedate">Departure Date</label>
+                      <input type="date"
+                             name="Departuredate"
+                             id="idDeparturedate"
+                             class="form-control"
+                             required />
+                    </div>
+                    <div class="form-group col-md-3">
+                      <label for="idReturndate">Return Date</label>
+                      <input type="date" name="Returndate" id="idReturndate" class="form-control" />
+                    </div>
+                    <div class="form-group col-md-2">
+                      <label for="passengerCount">Passengers</label>
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <button class="btn btn-outline-secondary"
+                                  type="button"
+                                  id="decreasePassengers">-</button>
+                        </div>
+                        <input type="number"
+                               class="form-control"
+                               id="passengerCount"
+                               name="passengerCount"
+                               value="1"
+                               min="1" />
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-secondary"
+                                  type="button"
+                                  id="increasePassengers">+</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label for="cabinClass">Cabin Class</label>
+                      <select class="form-control" id="cabinClass" name="cabinClass">
+                        <option value="economy">Economy</option>
+                        <option value="premium_economy">Premium Economy</option>
+                        <option value="business">Business</option>
+                        <option value="first">First Class</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group col-md-3">
+                      <label for="tripType">Trip Type</label>
+                      <select class="form-control" id="tripType" name="tripType">
+                        <option value="one-way">One-Way</option>
+                        <option value="round-trip" selected>Round-Trip</option>
+                        <option value="multi-city">Multi-City</option>
+                      </select>
+                    </div>
+                    <div class="form-group col-md-9 text-right">
+                      <button class="btn btn-primary btn-lg" type="submit">
+                        Search Flights
+                        <i class="fas fa-plane-departure ml-2"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Popular Destinations -->
+    <section class="py-5">
+      <div class="container">
+        <h3 class="text-center mb-4">Popular Destinations</h3>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card mb-4">
+              <img src="{% static 'images/paris.webp' %}"
+                   class="card-img-top"
+                   alt="Paris, France" />
+              <div class="card-body">
+                <h5 class="card-title">Paris, France</h5>
+                <p class="card-text">Discover the city of love and lights.</p>
+                <a href="#search" class="btn btn-primary">Book Now</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-4">
+              <img src="{% static 'images/tokyo.webp' %}"
+                   class="card-img-top"
+                   alt="Tokyo, Japan" />
+              <div class="card-body">
+                <h5 class="card-title">Tokyo, Japan</h5>
+                <p class="card-text">Experience the perfect blend of tradition and technology.</p>
+                <a href="#search" class="btn btn-primary">Book Now</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-4">
+              <img src="{% static 'images/new_york.webp' %}"
+                   class="card-img-top"
+                   alt="New York, USA" />
+              <div class="card-body">
+                <h5 class="card-title">New York, USA</h5>
+                <p class="card-text">Explore the city that never sleeps.</p>
+                <a href="#search" class="btn btn-primary">Book Now</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container text-center">
+        <p>&copy; 2024 Seplat Booking. All rights reserved.</p>
+        <p>
+          <a href="{% url 'update_price_increment' %}">Terms of Service</a> | <a href="#">Privacy Policy</a>
+        </p>
+      </div>
+    </footer>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery UI (for Autocomplete) -->
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+      $(document).ready(function () {
+  
+        // Autocomplete for Origin
+        $("#inputOrigin").autocomplete({
+          source: function(request, response) {
+            $.ajax({
+              url: "{% url 'origin_airport_search' %}",
+              data: { term: request.term },
+              success: function(data) {
+                response(data);
+              }
+            });
+          },
+          minLength: 1,
+          delay: 200
+        });
+      
+        // Autocomplete for Destination
+        $("#inputDestination").autocomplete({
+          source: function(request, response) {
+            $.ajax({
+              url: "{% url 'destination_airport_search' %}",
+              data: { term: request.term },
+              success: function(data) {
+                response(data);
+              }
+            });
+          },
+          minLength: 1,
+          delay: 200
+        });
+      
+        // Form submission - Trims airport codes to 3 characters
+        $("#form_id").on("submit", function (e) {
+          e.preventDefault();
+          var origin = $("#inputOrigin").val().slice(0, 3).toUpperCase();
+          var destination = $("#inputDestination").val().slice(0, 3).toUpperCase();
+      
+          $("#inputOrigin").val(origin);
+          $("#inputDestination").val(destination);
+          
+          // Allow form submission after updates
+          $(this).off("submit").submit();
+        });
+      
+        // Passenger count increase and decrease buttons
+        $("#increasePassengers").click(function () {
+          let count = parseInt($("#passengerCount").val());
+          $("#passengerCount").val(count + 1);
+        });
+      
+        $("#decreasePassengers").click(function () {
+          let count = parseInt($("#passengerCount").val());
+          if (count > 1) {
+            $("#passengerCount").val(count - 1);
+          }
+        });
+      });
+      
+    </script>
+  </body>
+</html>
